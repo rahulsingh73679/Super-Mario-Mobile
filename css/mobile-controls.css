@@ -1,0 +1,91 @@
+/* Mobile Controls Styling */
+.mobile-controls {
+  display: none; /* Hidden by default, will be shown on mobile devices */
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  touch-action: none;
+}
+
+.d-pad {
+  position: absolute;
+  left: 20px;
+  bottom: 0;
+  display: flex;
+  gap: 10px;
+}
+
+.action-buttons {
+  position: absolute;
+  right: 20px;
+  bottom: 0;
+  display: flex;
+  gap: 10px;
+}
+
+.control-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.control-btn:active {
+  background-color: rgba(255, 255, 255, 0.5);
+  transform: scale(0.95);
+}
+
+.d-pad-left, .d-pad-right {
+  font-size: 24px;
+}
+
+.action-btn {
+  background-color: rgba(255, 0, 0, 0.3);
+  border: 2px solid rgba(255, 0, 0, 0.5);
+}
+
+.action-btn:active {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  .mobile-controls {
+    display: block;
+  }
+  
+  /* Hide the keyboard info on mobile */
+  .info {
+    display: none;
+  }
+  
+  /* Adjust canvas for mobile */
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 80vh;
+    object-fit: contain;
+  }
+}
+
+/* Prevent scrolling on mobile */
+html, body {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+} 
