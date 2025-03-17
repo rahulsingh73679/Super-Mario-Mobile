@@ -41,6 +41,12 @@
 		var fb = new Mario.Fireball([this.pos[0]+8,this.pos[1]]); //I hate you, Javascript.
 		fb.spawn(this.left);
 		this.shooting = 2;
+		
+		// Play fireball sound
+		if (sounds && sounds.fireball) {
+			sounds.fireball.currentTime = 0;
+			sounds.fireball.play().catch(e => {});
+		}
 	}
 
 	Player.prototype.noRun = function() {

@@ -31,11 +31,21 @@ document.body.appendChild(canvas);
 
 // Add mobile-friendly canvas attributes
 if (isMobile) {
+  // Optimize for landscape mode
   canvas.style.width = '100%';
   canvas.style.height = 'auto';
-  canvas.style.maxHeight = '80vh';
+  canvas.style.maxHeight = '85vh';
   canvas.style.display = 'block';
   canvas.style.margin = '0 auto';
+  canvas.style.position = 'relative';
+  canvas.style.top = '0';
+  
+  // Add touch-action none to prevent browser handling of touch events
+  canvas.style.touchAction = 'none';
+  
+  // Add the canvas to the game container instead of body
+  document.body.removeChild(canvas);
+  document.querySelector('.game-container').insertBefore(canvas, document.querySelector('.game-container').firstChild);
 }
 
 //viewport
@@ -102,16 +112,69 @@ function init() {
       music.overworld.play().then(() => {
         music.overworld.pause();
         music.overworld.currentTime = 0;
+        
+        // Start the game music after user interaction
+        setTimeout(() => {
+          music.overworld.play().catch(e => console.log("Audio play failed:", e));
+        }, 1000);
       }).catch(e => console.log("Audio play failed:", e));
       
       // Remove the event listener after first touch
       document.removeEventListener('touchstart', initAudio);
     }, { once: true });
+    
+    // Handle visibility changes for audio
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        // Pause all audio when game is not visible
+        Object.values(music).forEach(audio => {
+          if (!audio.paused) audio.pause();
+        });
+      } else {
+        // Resume music when game becomes visible again
+        if (music.overworld.paused && gameTime > 0) {
+          music.overworld.play().catch(e => console.log("Audio resume failed:", e));
+        }
+      }
+    });
   }
   
   Mario.oneone();
   lastTime = Date.now();
   main();
+  
+  // For mobile: check orientation on init
+  if (isMobile) {
+    checkOrientation();
+  }
+}
+
+// Function to check and handle orientation for mobile
+function checkOrientation() {
+  if (!isMobile) return;
+  
+  const orientationMessage = document.querySelector('.orientation-message');
+  const gameContainer = document.querySelector('.game-container');
+  
+  if (window.innerWidth < window.innerHeight) {
+    // Portrait mode
+    if (orientationMessage) orientationMessage.style.display = 'flex';
+    if (gameContainer) gameContainer.style.display = 'none';
+    
+    // Pause game in portrait mode
+    if (music && music.overworld && !music.overworld.paused) {
+      music.overworld.pause();
+    }
+  } else {
+    // Landscape mode
+    if (orientationMessage) orientationMessage.style.display = 'none';
+    if (gameContainer) gameContainer.style.display = 'block';
+    
+    // Resume game in landscape mode
+    if (music && music.overworld && music.overworld.paused && gameTime > 0) {
+      music.overworld.play().catch(e => {});
+    }
+  }
 }
 
 var gameTime = 0;

@@ -2,7 +2,7 @@
 .mobile-controls {
   display: none; /* Hidden by default, will be shown on mobile devices */
   position: fixed;
-  bottom: 20px;
+  bottom: 10px;
   left: 0;
   width: 100%;
   z-index: 1000;
@@ -61,8 +61,38 @@
   background-color: rgba(255, 0, 0, 0.5);
 }
 
+/* Landscape orientation lock message */
+.orientation-message {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  color: white;
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 24px;
+  padding: 20px;
+}
+
+.orientation-message img {
+  width: 80px;
+  height: 80px;
+  margin: 20px auto;
+  animation: rotate 2s infinite linear;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Media query for mobile devices */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .mobile-controls {
     display: block;
   }
@@ -76,8 +106,58 @@
   canvas {
     width: 100% !important;
     height: auto !important;
-    max-height: 80vh;
+    max-height: 70vh;
     object-fit: contain;
+    margin: 0 auto;
+    display: block;
+  }
+}
+
+/* Portrait orientation detection */
+@media (max-width: 1024px) and (orientation: portrait) {
+  .orientation-message {
+    display: flex;
+  }
+  
+  .game-container {
+    display: none;
+  }
+}
+
+/* Landscape orientation specific styles */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .orientation-message {
+    display: none;
+  }
+  
+  .game-container {
+    display: block;
+  }
+  
+  /* Optimize button sizes for landscape */
+  .control-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 16px;
+  }
+  
+  .d-pad {
+    left: 15px;
+    bottom: 5px;
+    gap: 8px;
+  }
+  
+  .action-buttons {
+    right: 15px;
+    bottom: 5px;
+    gap: 8px;
+    display: flex;
+    flex-direction: row;
+  }
+  
+  /* Ensure canvas fits properly in landscape */
+  canvas {
+    max-height: 85vh !important;
   }
 }
 
@@ -88,4 +168,5 @@ html, body {
   width: 100%;
   height: 100%;
   touch-action: none;
+  background-color: #000;
 } 

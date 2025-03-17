@@ -10,11 +10,19 @@
   // Only initialize mobile controls if on a mobile device
   if (!isMobile) return;
   
+  // Force landscape orientation if possible
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(function(error) {
+      console.log('Orientation lock failed: ' + error);
+    });
+  }
+  
   // Get control elements
   const btnLeft = document.getElementById('btn-left');
   const btnRight = document.getElementById('btn-right');
   const btnJump = document.getElementById('btn-jump');
   const btnRun = document.getElementById('btn-run');
+  const btnShoot = document.getElementById('btn-shoot');
   
   // Function to simulate key press/release
   function simulateKey(keyCode, isPressed) {
@@ -31,6 +39,7 @@
   const KEY_RIGHT = 39; // Right arrow
   const KEY_X = 74;     // X key (Jump)
   const KEY_Z = 90;     // Z key (Run)
+  const KEY_S = 83;     // S key (Shoot - same as Run for fireball)
   
   // Touch event handlers for left button
   btnLeft.addEventListener('touchstart', function(e) {
@@ -76,6 +85,17 @@
     simulateKey(KEY_Z, false);
   });
   
+  // Touch event handlers for shoot button (same as run but dedicated for shooting)
+  btnShoot.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    simulateKey(KEY_Z, true); // Use the same key as run since that's how the game handles shooting
+  });
+  
+  btnShoot.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    simulateKey(KEY_Z, false);
+  });
+  
   // Prevent default touch actions to avoid scrolling
   document.addEventListener('touchmove', function(e) {
     if (e.target.classList.contains('control-btn')) {
@@ -109,6 +129,7 @@
   handleTouchLeave(btnRight, KEY_RIGHT);
   handleTouchLeave(btnJump, KEY_X);
   handleTouchLeave(btnRun, KEY_Z);
+  handleTouchLeave(btnShoot, KEY_Z);
   
   // Disable zoom on double tap
   let lastTouchEnd = 0;
@@ -119,6 +140,27 @@
     }
     lastTouchEnd = now;
   }, false);
+  
+  // Check and handle orientation changes
+  function checkOrientation() {
+    const orientationMessage = document.querySelector('.orientation-message');
+    const gameContainer = document.querySelector('.game-container');
+    
+    if (window.innerWidth < window.innerHeight) {
+      // Portrait mode
+      if (orientationMessage) orientationMessage.style.display = 'flex';
+      if (gameContainer) gameContainer.style.display = 'none';
+    } else {
+      // Landscape mode
+      if (orientationMessage) orientationMessage.style.display = 'none';
+      if (gameContainer) gameContainer.style.display = 'block';
+    }
+  }
+  
+  // Check orientation on load and when orientation changes
+  window.addEventListener('load', checkOrientation);
+  window.addEventListener('resize', checkOrientation);
+  window.addEventListener('orientationchange', checkOrientation);
   
   // Adjust game canvas for mobile
   window.addEventListener('DOMContentLoaded', function() {
@@ -148,6 +190,7 @@
       // Resize on load and window resize
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
+      window.addEventListener('orientationchange', resizeCanvas);
     }
   });
 })(); 
