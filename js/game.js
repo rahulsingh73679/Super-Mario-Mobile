@@ -31,27 +31,59 @@ document.body.appendChild(canvas);
 
 // Add mobile-friendly canvas attributes
 if (isMobile) {
-  // Remove canvas from body
-  if (canvas.parentNode === document.body) {
-    document.body.removeChild(canvas);
-  }
+  // Optimize for landscape mode
+  canvas.style.width = '100%';
+  canvas.style.height = 'auto';
+  canvas.style.maxHeight = '80vh';
+  canvas.style.display = 'block';
+  canvas.style.margin = '0 auto';
+  canvas.style.position = 'relative';
+  canvas.style.top = '0';
+  
+  // Add touch-action none to prevent browser handling of touch events
+  canvas.style.touchAction = 'none';
+  
+  // Add the canvas to the game container instead of body
+  document.body.removeChild(canvas);
   
   // Wait for DOM to be fully loaded
   function addCanvasToContainer() {
-    var canvasContainer = document.getElementById('canvas-container');
-    if (canvasContainer) {
-      // Add canvas to container
-      canvasContainer.appendChild(canvas);
+    var gameContainer = document.querySelector('.game-container');
+    if (gameContainer) {
+      gameContainer.insertBefore(canvas, gameContainer.firstChild);
       
-      // Set basic canvas styles
-      canvas.style.position = 'absolute';
-      canvas.style.top = '0';
-      canvas.style.left = '0';
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
-      canvas.style.objectFit = 'contain';
+      // Set up resize handler
+      function resizeCanvas() {
+        var windowWidth = window.innerWidth;
+        var windowHeight = window.innerHeight;
+        var controlsHeight = 60; // Approximate height of controls
+        
+        // Calculate available height for canvas
+        var availableHeight = windowHeight - controlsHeight;
+        
+        // Calculate dimensions maintaining aspect ratio
+        var aspectRatio = canvas.width / canvas.height;
+        var newWidth, newHeight;
+        
+        if (windowWidth / availableHeight > aspectRatio) {
+          // Width is the limiting factor
+          newHeight = availableHeight * 0.9; // 90% of available height
+          newWidth = newHeight * aspectRatio;
+        } else {
+          // Height is the limiting factor
+          newWidth = windowWidth * 0.95; // 95% of window width
+          newHeight = newWidth / aspectRatio;
+        }
+        
+        // Apply new dimensions
+        canvas.style.width = newWidth + 'px';
+        canvas.style.height = newHeight + 'px';
+      }
       
-      console.log("Canvas added to container");
+      // Initial resize and add event listeners
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      window.addEventListener('orientationchange', resizeCanvas);
     } else {
       // If container not found yet, try again in a moment
       setTimeout(addCanvasToContainer, 100);
@@ -59,11 +91,7 @@ if (isMobile) {
   }
   
   // Start the process of adding canvas to container
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    addCanvasToContainer();
-  } else {
-    document.addEventListener('DOMContentLoaded', addCanvasToContainer);
-  }
+  addCanvasToContainer();
 }
 
 //viewport
@@ -164,14 +192,6 @@ function init() {
   // For mobile: check orientation on init
   if (isMobile) {
     checkOrientation();
-    
-    // Trigger resize to ensure proper crop mode
-    if (typeof resizeCanvasCrop === 'function') {
-      resizeCanvasCrop();
-    } else {
-      var event = new Event('resize');
-      window.dispatchEvent(event);
-    }
   }
 }
 

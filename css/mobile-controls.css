@@ -69,16 +69,6 @@
   background-color: rgba(255, 0, 0, 0.5);
 }
 
-/* Hide any keyboard elements from script21.js */
-.keyboard, 
-.keyboard__keys, 
-.keyboard__key {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
 /* Landscape orientation lock message */
 .orientation-message {
   display: none;
@@ -118,23 +108,6 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  position: relative;
-}
-
-/* Canvas container */
-.canvas-container {
-  width: 100%;
-  height: calc(100% - 70px); /* Leave space for controls */
-  overflow: hidden;
-  position: relative;
-  background-color: #000;
-}
-
-/* Basic canvas styling for all devices */
-canvas {
-  display: block;
-  margin: 0 auto;
-  background-color: #000;
 }
 
 /* Media query for mobile devices */
@@ -148,24 +121,14 @@ canvas {
     display: none;
   }
   
-  /* Hide any keyboard elements from script21.js */
-  .keyboard, 
-  .keyboard__keys, 
-  .keyboard__key {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
-  
-  /* Simple canvas styling for mobile */
+  /* Adjust canvas for mobile */
   canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: auto !important;
+    max-height: 70vh;
     object-fit: contain;
+    margin: 0 auto;
+    display: block;
   }
 }
 
@@ -210,6 +173,14 @@ canvas {
     display: flex;
     flex-direction: row;
   }
+  
+  /* Ensure canvas fits properly in landscape */
+  canvas {
+    max-height: 80vh !important;
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain;
+  }
 }
 
 /* Small landscape screens */
@@ -220,13 +191,12 @@ canvas {
     font-size: 12px;
   }
   
-  .mobile-controls {
-    bottom: 2px;
+  canvas {
+    max-height: 75vh !important;
   }
   
-  /* Canvas container for small screens */
-  .canvas-container {
-    height: calc(100% - 50px);
+  .mobile-controls {
+    bottom: 2px;
   }
 }
 
