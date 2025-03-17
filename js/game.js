@@ -31,67 +31,27 @@ document.body.appendChild(canvas);
 
 // Add mobile-friendly canvas attributes
 if (isMobile) {
-  // Optimize for landscape mode
-  canvas.style.width = 'auto';
-  canvas.style.height = '100%';
-  canvas.style.display = 'block';
-  canvas.style.margin = '0 auto';
-  canvas.style.position = 'relative';
-  canvas.style.maxWidth = '100%';
-  
-  // Add touch-action none to prevent browser handling of touch events
-  canvas.style.touchAction = 'none';
-  
-  // Add the canvas to the canvas container instead of body
-  document.body.removeChild(canvas);
+  // Remove canvas from body
+  if (canvas.parentNode === document.body) {
+    document.body.removeChild(canvas);
+  }
   
   // Wait for DOM to be fully loaded
   function addCanvasToContainer() {
     var canvasContainer = document.getElementById('canvas-container');
     if (canvasContainer) {
+      // Add canvas to container
       canvasContainer.appendChild(canvas);
       
-      // Set up resize handler for crop mode
-      function resizeCanvasCrop() {
-        var container = canvasContainer;
-        var containerWidth = container.clientWidth;
-        var containerHeight = container.clientHeight;
-        
-        // For full view mode, we want to show the entire game
-        // while maintaining the aspect ratio
-        var canvasAspect = canvas.width / canvas.height;
-        var containerAspect = containerWidth / containerHeight;
-        
-        if (containerAspect > canvasAspect) {
-          // Container is wider than canvas aspect ratio
-          // Make canvas height match container height
-          canvas.style.height = containerHeight + 'px';
-          canvas.style.width = 'auto';
-          
-          // Center horizontally
-          var computedWidth = containerHeight * canvasAspect;
-          canvas.style.left = ((containerWidth - computedWidth) / 2) + 'px';
-          canvas.style.top = '0';
-        } else {
-          // Container is taller than canvas aspect ratio
-          // Make canvas width match container width
-          canvas.style.width = containerWidth + 'px';
-          canvas.style.height = 'auto';
-          
-          // Center vertically
-          var computedHeight = containerWidth / canvasAspect;
-          canvas.style.top = ((containerHeight - computedHeight) / 2) + 'px';
-          canvas.style.left = '0';
-        }
-        
-        // Ensure canvas is positioned absolutely within container
-        canvas.style.position = 'absolute';
-      }
+      // Set basic canvas styles
+      canvas.style.position = 'absolute';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.objectFit = 'contain';
       
-      // Initial resize and add event listeners
-      resizeCanvasCrop();
-      window.addEventListener('resize', resizeCanvasCrop);
-      window.addEventListener('orientationchange', resizeCanvasCrop);
+      console.log("Canvas added to container");
     } else {
       // If container not found yet, try again in a moment
       setTimeout(addCanvasToContainer, 100);
@@ -99,7 +59,11 @@ if (isMobile) {
   }
   
   // Start the process of adding canvas to container
-  addCanvasToContainer();
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    addCanvasToContainer();
+  } else {
+    document.addEventListener('DOMContentLoaded', addCanvasToContainer);
+  }
 }
 
 //viewport

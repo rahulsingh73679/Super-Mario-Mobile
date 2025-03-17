@@ -27,6 +27,7 @@
         }
 
         pressedKeys[key] = status;
+        console.log("Key " + key + " set to " + status + " via keyboard");
     }
 
     document.addEventListener('keydown', function(e) {
@@ -39,6 +40,7 @@
 
     window.addEventListener('blur', function() {
         pressedKeys = {};
+        console.log("Keys reset due to blur");
     });
 
     // For mobile: handle visibility change to reset keys when app goes to background
@@ -47,6 +49,7 @@
             if (document.hidden) {
                 // Reset all keys when the game is not visible
                 pressedKeys = {};
+                console.log("Keys reset due to visibility change");
             }
         });
         
@@ -57,6 +60,7 @@
             pressedKeys['RIGHT'] = false;
             pressedKeys['JUMP'] = false;
             pressedKeys['RUN'] = false;
+            console.log("Keys reset due to resize");
         });
     }
 
@@ -70,10 +74,19 @@
           pressedKeys['RIGHT'] = false;
           pressedKeys['DOWN'] = false;
           pressedKeys['JUMP'] = false;
+          console.log("Keys reset via reset method");
         },
         // Direct method to set key state for mobile controls
         _setKey: function(key, status) {
             pressedKeys[key] = status;
+            console.log("Key " + key + " set to " + status + " via mobile");
+        },
+        // Debug method to get current key states
+        _getKeyStates: function() {
+            return Object.assign({}, pressedKeys);
         }
     };
+    
+    // Log that input system is initialized
+    console.log("Input system initialized. Mobile: " + isMobile);
 })();

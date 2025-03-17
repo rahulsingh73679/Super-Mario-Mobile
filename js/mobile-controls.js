@@ -7,21 +7,16 @@
   // Check if we're on a mobile device
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
-  // Force mobile controls for testing (remove in production)
+  // Force mobile controls for testing (set to false in production)
   const forceMobile = true;
   
   // Only initialize mobile controls if on a mobile device or forced
   if (!isMobile && !forceMobile) return;
   
-  // Force landscape orientation if possible
-  if (screen.orientation && screen.orientation.lock) {
-    screen.orientation.lock('landscape').catch(function(error) {
-      console.log('Orientation lock failed: ' + error);
-    });
-  }
-  
   // Wait for DOM to be fully loaded
   window.addEventListener('DOMContentLoaded', function() {
+    console.log("Mobile controls initializing...");
+    
     // Get control elements
     const btnLeft = document.getElementById('btn-left');
     const btnRight = document.getElementById('btn-right');
@@ -34,188 +29,97 @@
       return;
     }
     
-    // Function to directly set key state in the input module
-    function setKeyState(key, isPressed) {
-      if (window.input && typeof window.input.isDown === 'function') {
-        // Directly access the pressedKeys object through closure
-        const pressedKeysObj = {};
-        pressedKeysObj[key] = isPressed;
-        
-        // Use the input module's method to update key state
-        if (isPressed) {
-          window.input._setKey && window.input._setKey(key, true);
-        } else {
-          window.input._setKey && window.input._setKey(key, false);
-        }
-      }
-    }
-    
-    // Alternative method to simulate keyboard events
-    function simulateKey(keyCode, isPressed) {
-      const event = new KeyboardEvent(isPressed ? 'keydown' : 'keyup', {
-        keyCode: keyCode,
-        which: keyCode,
-        code: getKeyCodeString(keyCode),
-        key: getKeyString(keyCode),
-        bubbles: true
-      });
-      document.dispatchEvent(event);
-    }
-    
-    // Helper function to get key string from keyCode
-    function getKeyString(keyCode) {
-      switch(keyCode) {
-        case 37: return 'ArrowLeft';
-        case 39: return 'ArrowRight';
-        case 38: return 'ArrowUp';
-        case 40: return 'ArrowDown';
-        case 74: return 'j';
-        case 88: return 'x';
-        case 90: return 'z';
-        default: return String.fromCharCode(keyCode).toLowerCase();
-      }
-    }
-    
-    // Helper function to get code string from keyCode
-    function getKeyCodeString(keyCode) {
-      switch(keyCode) {
-        case 37: return 'ArrowLeft';
-        case 39: return 'ArrowRight';
-        case 38: return 'ArrowUp';
-        case 40: return 'ArrowDown';
-        case 74: return 'KeyJ';
-        case 88: return 'KeyX';
-        case 90: return 'KeyZ';
-        default: return 'Key' + String.fromCharCode(keyCode);
-      }
-    }
-    
-    // Key codes
-    const KEY_LEFT = 37;  // Left arrow
-    const KEY_RIGHT = 39; // Right arrow
-    const KEY_X = 88;     // X key (Jump)
-    const KEY_J = 74;     // J key (Jump alternative)
-    const KEY_Z = 90;     // Z key (Run)
-    
-    // Direct key mapping to the game's expected keys
-    const KEY_MAP = {
-      'left': 'LEFT',
-      'right': 'RIGHT',
-      'jump': 'JUMP',
-      'run': 'RUN',
-      'shoot': 'RUN'  // Shoot uses the same key as run
+    // Key mapping
+    const KEYS = {
+      LEFT: 37,  // Left arrow
+      RIGHT: 39, // Right arrow
+      JUMP: 88,  // X key
+      RUN: 90    // Z key
     };
     
-    // Touch event handlers with both methods
-    function handleTouchStart(button, key, keyCode) {
+    // Track active touches to handle multiple simultaneous button presses
+    const activeTouches = {};
+    
+    // Simple function to set key state directly in the input module
+    function setKey(keyName, isPressed) {
+      console.log("Setting key:", keyName, isPressed);
+      if (window.input && window.input._setKey) {
+        window.input._setKey(keyName, isPressed);
+      }
+    }
+    
+    // Handle button press
+    function buttonDown(button, keyName) {
+      button.classList.add('active');
+      setKey(keyName, true);
+    }
+    
+    // Handle button release
+    function buttonUp(button, keyName) {
+      button.classList.remove('active');
+      setKey(keyName, false);
+    }
+    
+    // Map buttons to their corresponding keys
+    const buttonMap = {
+      'btn-left': 'LEFT',
+      'btn-right': 'RIGHT',
+      'btn-jump': 'JUMP',
+      'btn-run': 'RUN',
+      'btn-shoot': 'RUN'  // Shoot uses the same key as run
+    };
+    
+    // Add touch event listeners to all control buttons
+    document.querySelectorAll('.control-btn').forEach(button => {
+      const keyName = buttonMap[button.id];
+      if (!keyName) return;
+      
+      // Touch start
       button.addEventListener('touchstart', function(e) {
         e.preventDefault();
-        e.stopPropagation();
-        
-        // Try both methods
-        setKeyState(key, true);
-        simulateKey(keyCode, true);
-        
-        // Visual feedback
-        button.classList.add('active');
-        
-        return false;
-      }, { passive: false });
-    }
-    
-    function handleTouchEnd(button, key, keyCode) {
-      button.addEventListener('touchend', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Try both methods
-        setKeyState(key, false);
-        simulateKey(keyCode, false);
-        
-        // Visual feedback
-        button.classList.remove('active');
-        
-        return false;
+        const touch = e.touches[0];
+        activeTouches[touch.identifier] = { button: button, key: keyName };
+        buttonDown(button, keyName);
       }, { passive: false });
       
+      // Touch end
+      button.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        Array.from(e.changedTouches).forEach(touch => {
+          if (activeTouches[touch.identifier] && 
+              activeTouches[touch.identifier].button === button) {
+            delete activeTouches[touch.identifier];
+            buttonUp(button, keyName);
+          }
+        });
+      }, { passive: false });
+      
+      // Touch cancel
       button.addEventListener('touchcancel', function(e) {
         e.preventDefault();
-        e.stopPropagation();
-        
-        // Try both methods
-        setKeyState(key, false);
-        simulateKey(keyCode, false);
-        
-        // Visual feedback
-        button.classList.remove('active');
-        
-        return false;
+        Array.from(e.changedTouches).forEach(touch => {
+          if (activeTouches[touch.identifier] && 
+              activeTouches[touch.identifier].button === button) {
+            delete activeTouches[touch.identifier];
+            buttonUp(button, keyName);
+          }
+        });
       }, { passive: false });
-    }
-    
-    // Apply touch handlers to all buttons
-    handleTouchStart(btnLeft, 'LEFT', KEY_LEFT);
-    handleTouchEnd(btnLeft, 'LEFT', KEY_LEFT);
-    
-    handleTouchStart(btnRight, 'RIGHT', KEY_RIGHT);
-    handleTouchEnd(btnRight, 'RIGHT', KEY_RIGHT);
-    
-    handleTouchStart(btnJump, 'JUMP', KEY_X);
-    handleTouchEnd(btnJump, 'JUMP', KEY_X);
-    
-    handleTouchStart(btnRun, 'RUN', KEY_Z);
-    handleTouchEnd(btnRun, 'RUN', KEY_Z);
-    
-    handleTouchStart(btnShoot, 'RUN', KEY_Z); // Same as run for shooting
-    handleTouchEnd(btnShoot, 'RUN', KEY_Z);
+    });
     
     // Prevent default touch actions to avoid scrolling
     document.addEventListener('touchmove', function(e) {
       if (e.target.classList.contains('control-btn')) {
         e.preventDefault();
-        return false;
       }
     }, { passive: false });
-    
-    // Handle touch leaving the button
-    function handleTouchLeave(button, key, keyCode) {
-      button.addEventListener('touchmove', function(e) {
-        const touch = e.touches[0];
-        const buttonRect = button.getBoundingClientRect();
-        
-        if (touch.clientX < buttonRect.left || 
-            touch.clientX > buttonRect.right || 
-            touch.clientY < buttonRect.top || 
-            touch.clientY > buttonRect.bottom) {
-          
-          // Try both methods
-          setKeyState(key, false);
-          simulateKey(keyCode, false);
-          
-          // Visual feedback
-          button.classList.remove('active');
-        }
-      }, { passive: false });
-    }
-    
-    // Apply touch leave handlers
-    handleTouchLeave(btnLeft, 'LEFT', KEY_LEFT);
-    handleTouchLeave(btnRight, 'RIGHT', KEY_RIGHT);
-    handleTouchLeave(btnJump, 'JUMP', KEY_X);
-    handleTouchLeave(btnRun, 'RUN', KEY_Z);
-    handleTouchLeave(btnShoot, 'RUN', KEY_Z);
     
     // Disable zoom on double tap
-    let lastTouchEnd = 0;
     document.addEventListener('touchend', function(e) {
-      const now = Date.now();
-      if (now - lastTouchEnd <= 300) {
-        e.preventDefault();
-      }
-      lastTouchEnd = now;
+      e.preventDefault();
     }, { passive: false });
     
-    // Check and handle orientation changes
+    // Handle orientation changes
     function checkOrientation() {
       const orientationMessage = document.querySelector('.orientation-message');
       const gameContainer = document.querySelector('.game-container');
@@ -228,11 +132,6 @@
         // Landscape mode
         if (orientationMessage) orientationMessage.style.display = 'none';
         if (gameContainer) gameContainer.style.display = 'block';
-        
-        // Trigger a resize event to ensure proper crop mode
-        setTimeout(() => {
-          window.dispatchEvent(new Event('resize'));
-        }, 100);
       }
     }
     
@@ -240,40 +139,28 @@
     checkOrientation();
     window.addEventListener('resize', checkOrientation);
     window.addEventListener('orientationchange', function() {
-      // Add a slight delay to ensure the orientation change is complete
       setTimeout(checkOrientation, 100);
     });
     
-    // Handle canvas positioning for mobile
+    // Position the canvas in the container
     const canvasContainer = document.getElementById('canvas-container');
     const canvas = document.querySelector('canvas');
     
     if (canvasContainer && canvas) {
-      // Add the canvas to the canvas container
-      canvasContainer.appendChild(canvas);
-      
-      // Ensure the canvas is properly sized to show the full game
-      function resizeCanvas() {
-        const containerWidth = canvasContainer.clientWidth;
-        const containerHeight = canvasContainer.clientHeight;
-        const canvasRatio = canvas.width / canvas.height;
-        const containerRatio = containerWidth / containerHeight;
-        
-        if (containerRatio > canvasRatio) {
-          // Container is wider than canvas aspect ratio
-          canvas.style.height = '100%';
-          canvas.style.width = 'auto';
-        } else {
-          // Container is taller than canvas aspect ratio
-          canvas.style.width = '100%';
-          canvas.style.height = 'auto';
-        }
+      // Make sure the canvas is in the container
+      if (canvas.parentNode !== canvasContainer) {
+        canvasContainer.appendChild(canvas);
       }
       
-      // Resize on load and when orientation changes
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
-      window.addEventListener('orientationchange', resizeCanvas);
+      // Set canvas styles directly
+      canvas.style.position = 'absolute';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.objectFit = 'contain';
+      
+      console.log("Canvas positioned in container");
     }
   });
 })(); 

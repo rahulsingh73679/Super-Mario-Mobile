@@ -37,6 +37,30 @@
     
     <!-- Game container -->
     <div class="game-container">
+      <!-- Canvas container -->
+      <div id="canvas-container" class="canvas-container">
+        <!-- Canvas will be inserted here by JavaScript -->
+      </div>
+      
+      <div class="info">
+        <p class="controls">Move: Arrow Keys, Jump: x, Run: Z</p>
+        <div class="links">My Links <br><a href=""></a> <a href="">LinkedIn</a> <a href="">github</a></div>
+      </div>
+      
+      <!-- Mobile controls container -->
+      <div id="mobile-controls" class="mobile-controls">
+        <div class="d-pad">
+          <button id="btn-left" class="control-btn d-pad-left">◀</button>
+          <button id="btn-right" class="control-btn d-pad-right">▶</button>
+        </div>
+        <div class="action-buttons">
+          <button id="btn-jump" class="control-btn action-btn">Jump</button>
+          <button id="btn-run" class="control-btn action-btn">Run</button>
+          <button id="btn-shoot" class="control-btn action-btn">Fire</button>
+        </div>
+      </div>
+      
+      <!-- Game scripts -->
       <script type="text/javascript" src="js/util.js"></script>
       <script type="text/javascript" src="js/input.js"></script>
       <script type="text/javascript" src="js/resources.js"></script>
@@ -62,29 +86,6 @@
       <script type="text/javascript" src="js/levels/11tunnel.js"></script>
       <script type="text/javascript" src="js/game.js"></script>
       <script type="text/javascript" src="js/mobile-controls.js"></script>
-      
-      <!-- Canvas container for crop mode -->
-      <div id="canvas-container" class="canvas-container">
-        <!-- Canvas will be inserted here by JavaScript -->
-      </div>
-      
-      <div class="info">
-        <p class="controls">Move: Arrow Keys, Jump: x, Run: Z</p>
-        <div class="links">My Links <br><a href=""></a> <a href="">LinkedIn</a> <a href="">github</a></div>
-      </div>
-      
-      <!-- Mobile controls container -->
-      <div id="mobile-controls" class="mobile-controls">
-        <div class="d-pad">
-          <button id="btn-left" class="control-btn d-pad-left">◀</button>
-          <button id="btn-right" class="control-btn d-pad-right">▶</button>
-        </div>
-        <div class="action-buttons">
-          <button id="btn-jump" class="control-btn action-btn">Jump</button>
-          <button id="btn-run" class="control-btn action-btn">Run</button>
-          <button id="btn-shoot" class="control-btn action-btn">Fire</button>
-        </div>
-      </div>
     </div>
   </body>
 </html>
