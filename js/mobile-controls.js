@@ -244,31 +244,33 @@
       setTimeout(checkOrientation, 100);
     });
     
-    // Adjust game canvas for mobile
+    // Handle canvas positioning for mobile
+    const canvasContainer = document.getElementById('canvas-container');
     const canvas = document.querySelector('canvas');
-    if (canvas) {
-      // Make sure the canvas is properly sized for mobile
+    
+    if (canvasContainer && canvas) {
+      // Add the canvas to the canvas container
+      canvasContainer.appendChild(canvas);
+      
+      // Ensure the canvas is properly sized to show the full game
       function resizeCanvas() {
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight * 0.8; // Leave room for controls
+        const containerWidth = canvasContainer.clientWidth;
+        const containerHeight = canvasContainer.clientHeight;
+        const canvasRatio = canvas.width / canvas.height;
+        const containerRatio = containerWidth / containerHeight;
         
-        // Maintain aspect ratio
-        const aspectRatio = canvas.width / canvas.height;
-        let newWidth, newHeight;
-        
-        if (windowWidth / windowHeight > aspectRatio) {
-          newHeight = windowHeight;
-          newWidth = newHeight * aspectRatio;
+        if (containerRatio > canvasRatio) {
+          // Container is wider than canvas aspect ratio
+          canvas.style.height = '100%';
+          canvas.style.width = 'auto';
         } else {
-          newWidth = windowWidth;
-          newHeight = newWidth / aspectRatio;
+          // Container is taller than canvas aspect ratio
+          canvas.style.width = '100%';
+          canvas.style.height = 'auto';
         }
-        
-        canvas.style.width = newWidth + 'px';
-        canvas.style.height = newHeight + 'px';
       }
       
-      // Resize on load and window resize
+      // Resize on load and when orientation changes
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
       window.addEventListener('orientationchange', resizeCanvas);

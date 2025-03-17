@@ -127,6 +127,10 @@
   height: calc(100% - 70px); /* Leave space for controls */
   overflow: hidden;
   position: relative;
+  background-color: #000; /* Add background color */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Media query for mobile devices */
@@ -150,18 +154,18 @@
     pointer-events: none !important;
   }
   
-  /* Adjust canvas for mobile - CROP MODE */
+  /* Adjust canvas for mobile - CHANGED FROM CROP MODE TO FULL VIEW */
   canvas {
     width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important; /* Changed from contain to cover for crop mode */
+    height: auto !important; /* Allow height to adjust proportionally */
+    object-fit: contain !important; /* Changed from cover to contain to show full game */
     margin: 0 auto;
     display: block;
     position: absolute;
-    top: 50%;
+    top: 0; /* Changed from 50% to 0 */
     left: 50%;
-    transform: translate(-50%, -50%);
-    max-height: none !important; /* Remove max-height constraint */
+    transform: translateX(-50%); /* Only transform X axis */
+    max-height: 100% !important; /* Ensure it fits within container */
   }
 }
 
@@ -207,18 +211,21 @@
     flex-direction: row;
   }
   
-  /* Ensure canvas fills screen in crop mode */
+  /* Ensure canvas shows full game in landscape */
   canvas {
-    width: 100% !important;
+    width: auto !important; /* Allow width to adjust proportionally */
     height: 100% !important;
-    object-fit: cover !important;
-    max-width: none !important;
-    max-height: none !important;
+    object-fit: contain !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
   }
   
-  /* Canvas container for crop mode */
+  /* Canvas container for landscape */
   .canvas-container {
     height: calc(100% - 60px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 

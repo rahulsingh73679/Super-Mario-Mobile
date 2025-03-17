@@ -32,14 +32,12 @@ document.body.appendChild(canvas);
 // Add mobile-friendly canvas attributes
 if (isMobile) {
   // Optimize for landscape mode
-  canvas.style.width = '100%';
+  canvas.style.width = 'auto';
   canvas.style.height = '100%';
   canvas.style.display = 'block';
-  canvas.style.margin = '0';
-  canvas.style.position = 'absolute';
-  canvas.style.top = '50%';
-  canvas.style.left = '50%';
-  canvas.style.transform = 'translate(-50%, -50%)';
+  canvas.style.margin = '0 auto';
+  canvas.style.position = 'relative';
+  canvas.style.maxWidth = '100%';
   
   // Add touch-action none to prevent browser handling of touch events
   canvas.style.touchAction = 'none';
@@ -59,36 +57,35 @@ if (isMobile) {
         var containerWidth = container.clientWidth;
         var containerHeight = container.clientHeight;
         
-        // For crop mode, we want to fill the container completely
-        // while maintaining the aspect ratio, which means some content may be cropped
+        // For full view mode, we want to show the entire game
+        // while maintaining the aspect ratio
         var canvasAspect = canvas.width / canvas.height;
         var containerAspect = containerWidth / containerHeight;
         
         if (containerAspect > canvasAspect) {
           // Container is wider than canvas aspect ratio
-          // Make canvas width match container width
-          var newWidth = containerWidth;
-          var newHeight = newWidth / canvasAspect;
+          // Make canvas height match container height
+          canvas.style.height = containerHeight + 'px';
+          canvas.style.width = 'auto';
           
-          // This will make the height overflow, which is what we want for crop mode
-          canvas.style.width = newWidth + 'px';
-          canvas.style.height = newHeight + 'px';
+          // Center horizontally
+          var computedWidth = containerHeight * canvasAspect;
+          canvas.style.left = ((containerWidth - computedWidth) / 2) + 'px';
+          canvas.style.top = '0';
         } else {
           // Container is taller than canvas aspect ratio
-          // Make canvas height match container height
-          var newHeight = containerHeight;
-          var newWidth = newHeight * canvasAspect;
+          // Make canvas width match container width
+          canvas.style.width = containerWidth + 'px';
+          canvas.style.height = 'auto';
           
-          // This will make the width overflow, which is what we want for crop mode
-          canvas.style.width = newWidth + 'px';
-          canvas.style.height = newHeight + 'px';
+          // Center vertically
+          var computedHeight = containerWidth / canvasAspect;
+          canvas.style.top = ((containerHeight - computedHeight) / 2) + 'px';
+          canvas.style.left = '0';
         }
         
-        // Center the canvas in the container
+        // Ensure canvas is positioned absolutely within container
         canvas.style.position = 'absolute';
-        canvas.style.top = '50%';
-        canvas.style.left = '50%';
-        canvas.style.transform = 'translate(-50%, -50%)';
       }
       
       // Initial resize and add event listeners
