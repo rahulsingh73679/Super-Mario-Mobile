@@ -33,57 +33,68 @@ document.body.appendChild(canvas);
 if (isMobile) {
   // Optimize for landscape mode
   canvas.style.width = '100%';
-  canvas.style.height = 'auto';
-  canvas.style.maxHeight = '80vh';
+  canvas.style.height = '100%';
   canvas.style.display = 'block';
-  canvas.style.margin = '0 auto';
-  canvas.style.position = 'relative';
-  canvas.style.top = '0';
+  canvas.style.margin = '0';
+  canvas.style.position = 'absolute';
+  canvas.style.top = '50%';
+  canvas.style.left = '50%';
+  canvas.style.transform = 'translate(-50%, -50%)';
   
   // Add touch-action none to prevent browser handling of touch events
   canvas.style.touchAction = 'none';
   
-  // Add the canvas to the game container instead of body
+  // Add the canvas to the canvas container instead of body
   document.body.removeChild(canvas);
   
   // Wait for DOM to be fully loaded
   function addCanvasToContainer() {
-    var gameContainer = document.querySelector('.game-container');
-    if (gameContainer) {
-      gameContainer.insertBefore(canvas, gameContainer.firstChild);
+    var canvasContainer = document.getElementById('canvas-container');
+    if (canvasContainer) {
+      canvasContainer.appendChild(canvas);
       
-      // Set up resize handler
-      function resizeCanvas() {
-        var windowWidth = window.innerWidth;
-        var windowHeight = window.innerHeight;
-        var controlsHeight = 60; // Approximate height of controls
+      // Set up resize handler for crop mode
+      function resizeCanvasCrop() {
+        var container = canvasContainer;
+        var containerWidth = container.clientWidth;
+        var containerHeight = container.clientHeight;
         
-        // Calculate available height for canvas
-        var availableHeight = windowHeight - controlsHeight;
+        // For crop mode, we want to fill the container completely
+        // while maintaining the aspect ratio, which means some content may be cropped
+        var canvasAspect = canvas.width / canvas.height;
+        var containerAspect = containerWidth / containerHeight;
         
-        // Calculate dimensions maintaining aspect ratio
-        var aspectRatio = canvas.width / canvas.height;
-        var newWidth, newHeight;
-        
-        if (windowWidth / availableHeight > aspectRatio) {
-          // Width is the limiting factor
-          newHeight = availableHeight * 0.9; // 90% of available height
-          newWidth = newHeight * aspectRatio;
+        if (containerAspect > canvasAspect) {
+          // Container is wider than canvas aspect ratio
+          // Make canvas width match container width
+          var newWidth = containerWidth;
+          var newHeight = newWidth / canvasAspect;
+          
+          // This will make the height overflow, which is what we want for crop mode
+          canvas.style.width = newWidth + 'px';
+          canvas.style.height = newHeight + 'px';
         } else {
-          // Height is the limiting factor
-          newWidth = windowWidth * 0.95; // 95% of window width
-          newHeight = newWidth / aspectRatio;
+          // Container is taller than canvas aspect ratio
+          // Make canvas height match container height
+          var newHeight = containerHeight;
+          var newWidth = newHeight * canvasAspect;
+          
+          // This will make the width overflow, which is what we want for crop mode
+          canvas.style.width = newWidth + 'px';
+          canvas.style.height = newHeight + 'px';
         }
         
-        // Apply new dimensions
-        canvas.style.width = newWidth + 'px';
-        canvas.style.height = newHeight + 'px';
+        // Center the canvas in the container
+        canvas.style.position = 'absolute';
+        canvas.style.top = '50%';
+        canvas.style.left = '50%';
+        canvas.style.transform = 'translate(-50%, -50%)';
       }
       
       // Initial resize and add event listeners
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
-      window.addEventListener('orientationchange', resizeCanvas);
+      resizeCanvasCrop();
+      window.addEventListener('resize', resizeCanvasCrop);
+      window.addEventListener('orientationchange', resizeCanvasCrop);
     } else {
       // If container not found yet, try again in a moment
       setTimeout(addCanvasToContainer, 100);
@@ -192,6 +203,14 @@ function init() {
   // For mobile: check orientation on init
   if (isMobile) {
     checkOrientation();
+    
+    // Trigger resize to ensure proper crop mode
+    if (typeof resizeCanvasCrop === 'function') {
+      resizeCanvasCrop();
+    } else {
+      var event = new Event('resize');
+      window.dispatchEvent(event);
+    }
   }
 }
 

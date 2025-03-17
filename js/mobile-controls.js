@@ -228,13 +228,21 @@
         // Landscape mode
         if (orientationMessage) orientationMessage.style.display = 'none';
         if (gameContainer) gameContainer.style.display = 'block';
+        
+        // Trigger a resize event to ensure proper crop mode
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 100);
       }
     }
     
     // Check orientation on load and when orientation changes
     checkOrientation();
     window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
+    window.addEventListener('orientationchange', function() {
+      // Add a slight delay to ensure the orientation change is complete
+      setTimeout(checkOrientation, 100);
+    });
     
     // Adjust game canvas for mobile
     const canvas = document.querySelector('canvas');

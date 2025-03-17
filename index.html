@@ -12,6 +12,13 @@
     <link rel="stylesheet" href="css/game.css">
     <link rel="stylesheet" href="style21.css">
     <link rel="stylesheet" href="css/mobile-controls.css">
+    
+    <!-- Conditionally load script21.js only on non-mobile devices -->
+    <script type="text/javascript">
+      if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        document.write('<script type="text/javascript" src="script21.js"><\/script>');
+      }
+    </script>
   </head>
   <body>
     <!-- Orientation message for portrait mode -->
@@ -54,8 +61,13 @@
       <script type="text/javascript" src="js/levels/11.js"></script>
       <script type="text/javascript" src="js/levels/11tunnel.js"></script>
       <script type="text/javascript" src="js/game.js"></script>
-      <script type="text/javascript" src="script21.js"></script>
       <script type="text/javascript" src="js/mobile-controls.js"></script>
+      
+      <!-- Canvas container for crop mode -->
+      <div id="canvas-container" class="canvas-container">
+        <!-- Canvas will be inserted here by JavaScript -->
+      </div>
+      
       <div class="info">
         <p class="controls">Move: Arrow Keys, Jump: x, Run: Z</p>
         <div class="links">My Links <br><a href=""></a> <a href="">LinkedIn</a> <a href="">github</a></div>

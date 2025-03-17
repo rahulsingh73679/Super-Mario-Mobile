@@ -69,6 +69,16 @@
   background-color: rgba(255, 0, 0, 0.5);
 }
 
+/* Hide any keyboard elements from script21.js */
+.keyboard, 
+.keyboard__keys, 
+.keyboard__key {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Landscape orientation lock message */
 .orientation-message {
   display: none;
@@ -108,6 +118,15 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  position: relative;
+}
+
+/* Canvas container for crop mode */
+.canvas-container {
+  width: 100%;
+  height: calc(100% - 70px); /* Leave space for controls */
+  overflow: hidden;
+  position: relative;
 }
 
 /* Media query for mobile devices */
@@ -121,14 +140,28 @@
     display: none;
   }
   
-  /* Adjust canvas for mobile */
+  /* Hide any keyboard elements from script21.js */
+  .keyboard, 
+  .keyboard__keys, 
+  .keyboard__key {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  
+  /* Adjust canvas for mobile - CROP MODE */
   canvas {
     width: 100% !important;
-    height: auto !important;
-    max-height: 70vh;
-    object-fit: contain;
+    height: 100% !important;
+    object-fit: cover !important; /* Changed from contain to cover for crop mode */
     margin: 0 auto;
     display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: none !important; /* Remove max-height constraint */
   }
 }
 
@@ -174,12 +207,18 @@
     flex-direction: row;
   }
   
-  /* Ensure canvas fits properly in landscape */
+  /* Ensure canvas fills screen in crop mode */
   canvas {
-    max-height: 80vh !important;
     width: 100% !important;
-    height: auto !important;
-    object-fit: contain;
+    height: 100% !important;
+    object-fit: cover !important;
+    max-width: none !important;
+    max-height: none !important;
+  }
+  
+  /* Canvas container for crop mode */
+  .canvas-container {
+    height: calc(100% - 60px);
   }
 }
 
@@ -191,12 +230,13 @@
     font-size: 12px;
   }
   
-  canvas {
-    max-height: 75vh !important;
-  }
-  
   .mobile-controls {
     bottom: 2px;
+  }
+  
+  /* Canvas container for small screens */
+  .canvas-container {
+    height: calc(100% - 50px);
   }
 }
 

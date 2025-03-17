@@ -8,10 +8,25 @@
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
     user-select: none;
     transition: bottom 0.4s;
+    display: none; /* Hide by default */
 }
 
 .keyboard--hidden {
     bottom: -100%;
+    display: none; /* Ensure it's completely hidden */
+    visibility: hidden; /* Extra measure to hide it */
+    opacity: 0; /* Make it transparent */
+    pointer-events: none; /* Prevent interaction */
+}
+
+/* Hide keyboard on mobile devices */
+@media (max-width: 1024px) {
+    .keyboard {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
 }
 
 .keyboard__keys {
