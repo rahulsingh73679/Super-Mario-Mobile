@@ -34,7 +34,7 @@ if (isMobile) {
   // Optimize for landscape mode
   canvas.style.width = '100%';
   canvas.style.height = 'auto';
-  canvas.style.maxHeight = '85vh';
+  canvas.style.maxHeight = '80vh';
   canvas.style.display = 'block';
   canvas.style.margin = '0 auto';
   canvas.style.position = 'relative';
@@ -45,7 +45,53 @@ if (isMobile) {
   
   // Add the canvas to the game container instead of body
   document.body.removeChild(canvas);
-  document.querySelector('.game-container').insertBefore(canvas, document.querySelector('.game-container').firstChild);
+  
+  // Wait for DOM to be fully loaded
+  function addCanvasToContainer() {
+    var gameContainer = document.querySelector('.game-container');
+    if (gameContainer) {
+      gameContainer.insertBefore(canvas, gameContainer.firstChild);
+      
+      // Set up resize handler
+      function resizeCanvas() {
+        var windowWidth = window.innerWidth;
+        var windowHeight = window.innerHeight;
+        var controlsHeight = 60; // Approximate height of controls
+        
+        // Calculate available height for canvas
+        var availableHeight = windowHeight - controlsHeight;
+        
+        // Calculate dimensions maintaining aspect ratio
+        var aspectRatio = canvas.width / canvas.height;
+        var newWidth, newHeight;
+        
+        if (windowWidth / availableHeight > aspectRatio) {
+          // Width is the limiting factor
+          newHeight = availableHeight * 0.9; // 90% of available height
+          newWidth = newHeight * aspectRatio;
+        } else {
+          // Height is the limiting factor
+          newWidth = windowWidth * 0.95; // 95% of window width
+          newHeight = newWidth / aspectRatio;
+        }
+        
+        // Apply new dimensions
+        canvas.style.width = newWidth + 'px';
+        canvas.style.height = newHeight + 'px';
+      }
+      
+      // Initial resize and add event listeners
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      window.addEventListener('orientationchange', resizeCanvas);
+    } else {
+      // If container not found yet, try again in a moment
+      setTimeout(addCanvasToContainer, 100);
+    }
+  }
+  
+  // Start the process of adding canvas to container
+  addCanvasToContainer();
 }
 
 //viewport

@@ -70,6 +70,10 @@
           pressedKeys['RIGHT'] = false;
           pressedKeys['DOWN'] = false;
           pressedKeys['JUMP'] = false;
+        },
+        // Direct method to set key state for mobile controls
+        _setKey: function(key, status) {
+            pressedKeys[key] = status;
         }
     };
 })();
